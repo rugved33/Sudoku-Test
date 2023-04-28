@@ -5,42 +5,42 @@ using UnityEngine;
 [System.Serializable]
 public class Pool
 {
-    private Queue<Component> m_elements;
-    private Component m_prefab;
-    private bool m_dynamicSize;
-    private Transform m_defaultParent;
+    private Queue<Component> _elements;
+    private Component _prefab;
+    private bool _dynamicSize;
+    private Transform _defaultParent;
 
 
     public Pool(bool dynamicSize, Component prefab, int initialSize, Transform defaultParent)
     {
-        m_elements = new Queue<Component>();
-        m_prefab = prefab;
-        m_dynamicSize = dynamicSize;
-        m_defaultParent = defaultParent;
+        _elements = new Queue<Component>();
+        _prefab = prefab;
+        _dynamicSize = dynamicSize;
+        _defaultParent = defaultParent;
 
         for(int j = 0; j < initialSize; j++)
         {
-            Component obj = Object.Instantiate(m_prefab) as Component;
-            obj.transform.name = m_prefab.transform.name;
+            Component obj = Object.Instantiate(_prefab) as Component;
+            obj.transform.name = _prefab.transform.name;
 
-            obj.transform.SetParent(m_defaultParent, false);
+            obj.transform.SetParent(_defaultParent, false);
             obj.gameObject.SetActive(false);
-            m_elements.Enqueue(obj);
+            _elements.Enqueue(obj);
         }
     }
 
     public void Clear()
     {
-        while(m_elements.Count > 0)
+        while(_elements.Count > 0)
         {
-            Component element = m_elements.Dequeue();
+            Component element = _elements.Dequeue();
             Object.Destroy(element);
         }
     }
 
     public T GetElement<T>() where T : Component
     {
-        return GetElement<T>(m_defaultParent);
+        return GetElement<T>(_defaultParent);
     }
 
     public T GetElement<T>(Transform newParent, bool worldPositionStays = true) where T : Component
@@ -49,20 +49,20 @@ public class Pool
 
         if(newParent == null)
         {
-            newParent = m_defaultParent;
+            newParent = _defaultParent;
         }
 
-        if(m_elements.Count > 0)
+        if(_elements.Count > 0)
         {
-            element = m_elements.Dequeue() as T;
+            element = _elements.Dequeue() as T;
         }
         else
         {
-            if(m_dynamicSize)
+            if(_dynamicSize)
             {
-                element = Object.Instantiate(m_prefab) as T;
-                element.name = m_prefab.name;
-                element.transform.SetParent(m_defaultParent, worldPositionStays);
+                element = Object.Instantiate(_prefab) as T;
+                element.name = _prefab.name;
+                element.transform.SetParent(_defaultParent, worldPositionStays);
             }
         }
         if(element != null)
@@ -75,8 +75,8 @@ public class Pool
 
     public void ReturnElement(Component component)
     {
-        component.transform.SetParent(m_defaultParent, true);
-        m_elements.Enqueue(component);
+        component.transform.SetParent(_defaultParent, true);
+        _elements.Enqueue(component);
         component.gameObject.SetActive(false);
     }
 }
